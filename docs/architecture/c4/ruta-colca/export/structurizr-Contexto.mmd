@@ -1,0 +1,32 @@
+graph LR
+  linkStyle default fill:#ffffff
+
+  subgraph diagram ["Diagrama de contexto de RutaColca"]
+    style diagram fill:#ffffff,stroke:#ffffff
+
+    1["<div style='font-weight: bold'>Turista</div><div style='font-size: 70%; margin-top: 0px'>[Person]</div><div style='font-size: 80%; margin-top:10px'>Busca tours y reserva una<br />salida al Colca.</div>"]
+    style 1 fill:#0b3d62,stroke:#072a44,color:#ffffff
+    11["<div style='font-weight: bold'>Pasarela de pagos</div><div style='font-size: 70%; margin-top: 0px'>[Software System]</div><div style='font-size: 80%; margin-top:10px'>Procesa tarjetas y<br />billeteras; devuelve una<br />referencia y el resultado del<br />pago.</div>"]
+    style 11 fill:#8c8c8c,stroke:#626262,color:#ffffff
+    12["<div style='font-weight: bold'>WhatsApp Business</div><div style='font-size: 70%; margin-top: 0px'>[Software System]</div><div style='font-size: 80%; margin-top:10px'>Entrega al guía el itinerario<br />y la lista del grupo.</div>"]
+    style 12 fill:#8c8c8c,stroke:#626262,color:#ffffff
+    13["<div style='font-weight: bold'>Sistema de AUTOCOLCA</div><div style='font-size: 70%; margin-top: 0px'>[Software System]</div><div style='font-size: 80%; margin-top:10px'>Valida el número del boleto<br />turístico mediante una API<br />HTTPS supuesta para el caso.</div>"]
+    style 13 fill:#8c8c8c,stroke:#626262,color:#ffffff
+    2["<div style='font-weight: bold'>Operador de agencia</div><div style='font-size: 70%; margin-top: 0px'>[Person]</div><div style='font-size: 80%; margin-top:10px'>Publica tours y registra<br />reservas presenciales.</div>"]
+    style 2 fill:#0b3d62,stroke:#072a44,color:#ffffff
+    3["<div style='font-weight: bold'>Guía de turismo</div><div style='font-size: 70%; margin-top: 0px'>[Person]</div><div style='font-size: 80%; margin-top:10px'>Recibe el itinerario y la<br />lista del grupo por WhatsApp.</div>"]
+    style 3 fill:#0b3d62,stroke:#072a44,color:#ffffff
+    4["<div style='font-weight: bold'>Administrador</div><div style='font-size: 70%; margin-top: 0px'>[Person]</div><div style='font-size: 80%; margin-top:10px'>Aprueba agencias y consulta<br />reportes de ventas.</div>"]
+    style 4 fill:#0b3d62,stroke:#072a44,color:#ffffff
+    5["<div style='font-weight: bold'>RutaColca</div><div style='font-size: 70%; margin-top: 0px'>[Software System]</div><div style='font-size: 80%; margin-top:10px'>Organiza tours, reservas y<br />pagos de agencias del Colca.</div>"]
+    style 5 fill:#1b5e8b,stroke:#124161,color:#ffffff
+
+    1-. "<div>Busca tours y reserva salidas<br />en</div><div style='font-size: 70%'></div>" .->5
+    2-. "<div>Publica tours y registra<br />reservas en</div><div style='font-size: 70%'></div>" .->5
+    4-. "<div>Aprueba agencias y consulta<br />ventas en</div><div style='font-size: 70%'></div>" .->5
+    5-. "<div>Solicita el cobro de reservas<br />a</div><div style='font-size: 70%'></div>" .->11
+    5-. "<div>Consulta la validez de<br />boletos en</div><div style='font-size: 70%'></div>" .->13
+    5-. "<div>Solicita el envío del<br />itinerario y la lista a</div><div style='font-size: 70%'></div>" .->12
+    12-. "<div>Entrega el itinerario y la<br />lista del grupo a</div><div style='font-size: 70%'></div>" .->3
+
+  end

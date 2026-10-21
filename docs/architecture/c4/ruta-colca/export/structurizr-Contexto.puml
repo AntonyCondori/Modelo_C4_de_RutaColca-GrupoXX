@@ -1,0 +1,42 @@
+@startuml
+title <size:24>Diagrama de contexto de RutaColca</size>\n<size:24>Diagrama de contexto de RutaColca</size>
+
+set separator none
+left to right direction
+
+<style>
+  root {
+    BackgroundColor: #ffffff
+    FontColor: #444444
+  }
+</style>
+
+!include <C4/C4>
+!include <C4/C4_Context>
+
+AddElementTag("Software System,Externo", $bgColor="#8c8c8c", $borderColor="#626262", $fontColor="#ffffff", $sprite="", $shadowing="", $borderStyle="solid")
+AddElementTag("Software System", $bgColor="#1b5e8b", $borderColor="#124161", $fontColor="#ffffff", $sprite="", $shadowing="", $borderStyle="solid")
+AddElementTag("Person", $bgColor="#0b3d62", $borderColor="#072a44", $fontColor="#ffffff", $sprite="", $shadowing="", $borderStyle="solid")
+
+AddRelTag("Relationship", $textColor="#444444", $lineColor="#444444", $lineStyle = DashedLine())
+
+Person(Turista, "Turista", $descr="Busca tours y reserva una salida al Colca.", $tags="Person", $link="")
+System(Pasareladepagos, "Pasarela de pagos", $descr="Procesa tarjetas y billeteras; devuelve una referencia y el resultado del pago.", $tags="Software System,Externo", $link="")
+System(WhatsAppBusiness, "WhatsApp Business", $descr="Entrega al guía el itinerario y la lista del grupo.", $tags="Software System,Externo", $link="")
+System(SistemadeAUTOCOLCA, "Sistema de AUTOCOLCA", $descr="Valida el número del boleto turístico mediante una API HTTPS supuesta para el caso.", $tags="Software System,Externo", $link="")
+Person(Operadordeagencia, "Operador de agencia", $descr="Publica tours y registra reservas presenciales.", $tags="Person", $link="")
+Person(Guíadeturismo, "Guía de turismo", $descr="Recibe el itinerario y la lista del grupo por WhatsApp.", $tags="Person", $link="")
+Person(Administrador, "Administrador", $descr="Aprueba agencias y consulta reportes de ventas.", $tags="Person", $link="")
+System(RutaColca, "RutaColca", $descr="Organiza tours, reservas y pagos de agencias del Colca.", $tags="Software System", $link="")
+
+Rel(Turista, RutaColca, "Busca tours y reserva salidas en", $techn="", $tags="Relationship", $link="")
+Rel(Operadordeagencia, RutaColca, "Publica tours y registra reservas en", $techn="", $tags="Relationship", $link="")
+Rel(Administrador, RutaColca, "Aprueba agencias y consulta ventas en", $techn="", $tags="Relationship", $link="")
+Rel(RutaColca, Pasareladepagos, "Solicita el cobro de reservas a", $techn="", $tags="Relationship", $link="")
+Rel(RutaColca, SistemadeAUTOCOLCA, "Consulta la validez de boletos en", $techn="", $tags="Relationship", $link="")
+Rel(RutaColca, WhatsAppBusiness, "Solicita el envío del itinerario y la lista a", $techn="", $tags="Relationship", $link="")
+Rel(WhatsAppBusiness, Guíadeturismo, "Entrega el itinerario y la lista del grupo a", $techn="", $tags="Relationship", $link="")
+
+SHOW_LEGEND(true)
+hide stereotypes
+@enduml

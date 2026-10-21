@@ -1,0 +1,69 @@
+@startuml
+title <size:24>Diagrama de despliegue de RutaColca - producción en temporada alta</size>\n<size:24>Diagrama de despliegue de RutaColca - producción en temporada alta</size>
+
+set separator none
+top to bottom direction
+
+<style>
+  root {
+    BackgroundColor: #ffffff
+    FontColor: #444444
+  }
+</style>
+
+!include <C4/C4>
+!include <C4/C4_Context>
+!include <C4/C4_Container>
+!include <C4/C4_Deployment>
+
+AddElementTag("Container,Almacen,Reto", $bgColor="#0e7d73", $borderColor="#a65e00", $fontColor="#ffffff", $sprite="", $shadowing="", $borderStyle="solid", $borderThickness="3")
+AddElementTag("Container,Almacen", $bgColor="#0e7d73", $borderColor="#095750", $fontColor="#ffffff", $sprite="", $shadowing="", $borderStyle="solid")
+AddElementTag("Element", $bgColor="#ffffff", $borderColor="#444444", $fontColor="#444444", $sprite="", $shadowing="", $borderStyle="solid")
+AddElementTag("Container", $bgColor="#0e7d73", $borderColor="#095750", $fontColor="#ffffff", $sprite="", $shadowing="", $borderStyle="solid")
+AddElementTag("Infrastructure Node", $bgColor="#e1e7eb", $borderColor="#9da1a4", $fontColor="#222222", $sprite="", $shadowing="", $borderStyle="solid")
+
+AddRelTag("Relationship", $textColor="#444444", $lineColor="#444444", $lineStyle = DashedLine())
+
+Deployment_Node(Produccion.Celulardelturista, "Celular del turista", $type="Navegador web", $descr="Dispositivo desde el que se reserva el tour.", $tags="Element", $link="") {
+  Container(Produccion.Celulardelturista.Webdelturista_1, "Web del turista", $techn="React (SPA)", $descr="Permite buscar tours, registrar el boleto y solicitar una reserva.", $tags="Container", $link="")
+}
+
+Deployment_Node(Produccion.Tabletdelaagencia, "Tablet de la agencia", $type="Navegador compatible con PWA e IndexedDB", $descr="Dispositivo que mantiene solicitudes cuando no hay conexión.", $tags="Element", $link="") {
+  Container(Produccion.Tabletdelaagencia.Portaldeagencias_1, "Portal de agencias", $techn="React (PWA)", $descr="Gestiona tours y reservas; incluye acceso del administrador según su rol.", $tags="Container", $link="")
+  ContainerDb(Produccion.Tabletdelaagencia.Reservaslocales_1, "Reservas locales", $techn="IndexedDB", $descr="Guarda solicitudes presenciales pendientes de sincronización en la tablet.", $tags="Container,Almacen,Reto", $link="")
+}
+
+Deployment_Node(Produccion.Proveedorcloud, "Proveedor cloud", $type="Cloud", $descr="Infraestructura de producción; dos réplicas de API en temporada alta.", $tags="Element", $link="") {
+  Deployment_Node(Produccion.Proveedorcloud.BalanceadorHTTPS, "Balanceador HTTPS", $type="Balanceador gestionado", $descr="Distribuye solicitudes entre las dos réplicas de la API.", $tags="Infrastructure Node", $link="")
+  Deployment_Node(Produccion.Proveedorcloud.Alojamientoweb, "Alojamiento web", $type="Hosting estático HTTPS", $descr="Entrega los archivos React al navegador; la aplicación se ejecuta en el cliente.", $tags="Infrastructure Node", $link="")
+  Deployment_Node(Produccion.Proveedorcloud.VM1, "VM 1", $type="Linux / Docker", $descr="Primera réplica de la API.", $tags="Element", $link="") {
+    Container(Produccion.Proveedorcloud.VM1.APIdeRutaColca_1, "API de RutaColca", $techn="Java 21 / Spring Boot", $descr="Gestiona cupos, valida boletos, coordina pagos y programa avisos.", $tags="Container", $link="")
+  }
+
+  Deployment_Node(Produccion.Proveedorcloud.VM2, "VM 2", $type="Linux / Docker", $descr="Segunda réplica de la API.", $tags="Element", $link="") {
+    Container(Produccion.Proveedorcloud.VM2.APIdeRutaColca_1, "API de RutaColca", $techn="Java 21 / Spring Boot", $descr="Gestiona cupos, valida boletos, coordina pagos y programa avisos.", $tags="Container", $link="")
+  }
+
+  Deployment_Node(Produccion.Proveedorcloud.Basededatosgestionada, "Base de datos gestionada", $type="PostgreSQL 16 gestionado", $descr="Servicio persistente compartido por las dos réplicas.", $tags="Element", $link="") {
+    ContainerDb(Produccion.Proveedorcloud.Basededatosgestionada.Basededatos_1, "Base de datos", $techn="PostgreSQL 16", $descr="Guarda agencias, tours, salidas, reservas y referencias de pago.", $tags="Container,Almacen", $link="")
+  }
+
+}
+
+Rel(Produccion.Tabletdelaagencia.Portaldeagencias_1, Produccion.Tabletdelaagencia.Reservaslocales_1, "Guarda y consulta solicitudes pendientes en", $techn="API IndexedDB (local)", $tags="Relationship", $link="")
+Rel(Produccion.Celulardelturista.Webdelturista_1, Produccion.Proveedorcloud.VM1.APIdeRutaColca_1, "Solicita disponibilidad, validación y pago a", $techn="JSON/HTTPS", $tags="Relationship", $link="")
+Rel(Produccion.Tabletdelaagencia.Portaldeagencias_1, Produccion.Proveedorcloud.VM1.APIdeRutaColca_1, "Gestiona tours y sincroniza solicitudes al recuperar conexión con", $techn="JSON/HTTPS", $tags="Relationship", $link="")
+Rel(Produccion.Celulardelturista.Webdelturista_1, Produccion.Proveedorcloud.VM2.APIdeRutaColca_1, "Solicita disponibilidad, validación y pago a", $techn="JSON/HTTPS", $tags="Relationship", $link="")
+Rel(Produccion.Tabletdelaagencia.Portaldeagencias_1, Produccion.Proveedorcloud.VM2.APIdeRutaColca_1, "Gestiona tours y sincroniza solicitudes al recuperar conexión con", $techn="JSON/HTTPS", $tags="Relationship", $link="")
+Rel(Produccion.Proveedorcloud.VM1.APIdeRutaColca_1, Produccion.Proveedorcloud.Basededatosgestionada.Basededatos_1, "Consulta cupos y guarda reservas y referencias de pago en", $techn="JDBC/TLS", $tags="Relationship", $link="")
+Rel(Produccion.Proveedorcloud.VM2.APIdeRutaColca_1, Produccion.Proveedorcloud.Basededatosgestionada.Basededatos_1, "Consulta cupos y guarda reservas y referencias de pago en", $techn="JDBC/TLS", $tags="Relationship", $link="")
+Rel(Produccion.Celulardelturista, Produccion.Proveedorcloud.BalanceadorHTTPS, "Envía solicitudes de reserva a", $techn="JSON/HTTPS", $tags="Relationship", $link="")
+Rel(Produccion.Tabletdelaagencia, Produccion.Proveedorcloud.BalanceadorHTTPS, "Envía gestiones y sincronizaciones a", $techn="JSON/HTTPS", $tags="Relationship", $link="")
+Rel(Produccion.Celulardelturista, Produccion.Proveedorcloud.Alojamientoweb, "Descarga la web del turista desde", $techn="HTTPS", $tags="Relationship", $link="")
+Rel(Produccion.Tabletdelaagencia, Produccion.Proveedorcloud.Alojamientoweb, "Descarga y actualiza el portal desde", $techn="HTTPS", $tags="Relationship", $link="")
+Rel(Produccion.Proveedorcloud.BalanceadorHTTPS, Produccion.Proveedorcloud.VM1, "Distribuye solicitudes hacia", $techn="HTTPS", $tags="Relationship", $link="")
+Rel(Produccion.Proveedorcloud.BalanceadorHTTPS, Produccion.Proveedorcloud.VM2, "Distribuye solicitudes hacia", $techn="HTTPS", $tags="Relationship", $link="")
+
+SHOW_LEGEND(true)
+hide stereotypes
+@enduml
