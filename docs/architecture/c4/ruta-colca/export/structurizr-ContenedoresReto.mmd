@@ -1,0 +1,50 @@
+graph TB
+  linkStyle default fill:#ffffff
+
+  subgraph diagram ["Diagrama de contenedores de RutaColca - reservas sin conexión"]
+    style diagram fill:#ffffff,stroke:#ffffff
+
+    1["<div style='font-weight: bold'>Turista</div><div style='font-size: 70%; margin-top: 0px'>[Person]</div><div style='font-size: 80%; margin-top:10px'>Busca tours y reserva una<br />salida al Colca.</div>"]
+    style 1 fill:#0b3d62,stroke:#072a44,color:#ffffff
+    2["<div style='font-weight: bold'>Operador de agencia</div><div style='font-size: 70%; margin-top: 0px'>[Person]</div><div style='font-size: 80%; margin-top:10px'>Publica tours y registra<br />reservas presenciales.</div>"]
+    style 2 fill:#0b3d62,stroke:#072a44,color:#ffffff
+    3["<div style='font-weight: bold'>Guía de turismo</div><div style='font-size: 70%; margin-top: 0px'>[Person]</div><div style='font-size: 80%; margin-top:10px'>Recibe el itinerario y la<br />lista del grupo por WhatsApp.</div>"]
+    style 3 fill:#0b3d62,stroke:#072a44,color:#ffffff
+    4["<div style='font-weight: bold'>Administrador</div><div style='font-size: 70%; margin-top: 0px'>[Person]</div><div style='font-size: 80%; margin-top:10px'>Aprueba agencias y consulta<br />reportes de ventas.</div>"]
+    style 4 fill:#0b3d62,stroke:#072a44,color:#ffffff
+    11["<div style='font-weight: bold'>Pasarela de pagos</div><div style='font-size: 70%; margin-top: 0px'>[Software System]</div><div style='font-size: 80%; margin-top:10px'>Procesa tarjetas y<br />billeteras; devuelve una<br />referencia y el resultado del<br />pago.</div>"]
+    style 11 fill:#8c8c8c,stroke:#626262,color:#ffffff
+    12["<div style='font-weight: bold'>WhatsApp Business</div><div style='font-size: 70%; margin-top: 0px'>[Software System]</div><div style='font-size: 80%; margin-top:10px'>Entrega al guía el itinerario<br />y la lista del grupo.</div>"]
+    style 12 fill:#8c8c8c,stroke:#626262,color:#ffffff
+    13["<div style='font-weight: bold'>Sistema de AUTOCOLCA</div><div style='font-size: 70%; margin-top: 0px'>[Software System]</div><div style='font-size: 80%; margin-top:10px'>Valida el número del boleto<br />turístico mediante una API<br />HTTPS supuesta para el caso.</div>"]
+    style 13 fill:#8c8c8c,stroke:#626262,color:#ffffff
+
+    subgraph 5 ["RutaColca"]
+      style 5 fill:#ffffff,stroke:#124161,color:#124161
+
+      10[("<div style='font-weight: bold'>Reservas locales</div><div style='font-size: 70%; margin-top: 0px'>[Container: IndexedDB]</div><div style='font-size: 80%; margin-top:10px'>Guarda solicitudes<br />presenciales pendientes de<br />sincronización en la tablet.</div>")]
+      style 10 fill:#0e7d73,stroke:#a65e00,color:#ffffff
+      6["<div style='font-weight: bold'>Web del turista</div><div style='font-size: 70%; margin-top: 0px'>[Container: React (SPA)]</div><div style='font-size: 80%; margin-top:10px'>Permite buscar tours,<br />registrar el boleto y<br />solicitar una reserva.</div>"]
+      style 6 fill:#0e7d73,stroke:#095750,color:#ffffff
+      7["<div style='font-weight: bold'>Portal de agencias</div><div style='font-size: 70%; margin-top: 0px'>[Container: React (PWA)]</div><div style='font-size: 80%; margin-top:10px'>Gestiona tours y reservas;<br />incluye acceso del<br />administrador según su rol.</div>"]
+      style 7 fill:#0e7d73,stroke:#095750,color:#ffffff
+      8["<div style='font-weight: bold'>API de RutaColca</div><div style='font-size: 70%; margin-top: 0px'>[Container: Java 21 / Spring Boot]</div><div style='font-size: 80%; margin-top:10px'>Gestiona cupos, valida<br />boletos, coordina pagos y<br />programa avisos.</div>"]
+      style 8 fill:#0e7d73,stroke:#095750,color:#ffffff
+      9[("<div style='font-weight: bold'>Base de datos</div><div style='font-size: 70%; margin-top: 0px'>[Container: PostgreSQL 16]</div><div style='font-size: 80%; margin-top:10px'>Guarda agencias, tours,<br />salidas, reservas y<br />referencias de pago.</div>")]
+      style 9 fill:#0e7d73,stroke:#095750,color:#ffffff
+    end
+
+    12-. "<div>Entrega el itinerario y la<br />lista del grupo a</div><div style='font-size: 70%'></div>" .->3
+    1-. "<div>Busca tours y solicita<br />reservas en</div><div style='font-size: 70%'>[HTTPS]</div>" .->6
+    2-. "<div>Publica tours y registra<br />reservas en</div><div style='font-size: 70%'>[HTTPS]</div>" .->7
+    4-. "<div>Aprueba agencias y consulta<br />ventas en</div><div style='font-size: 70%'>[HTTPS]</div>" .->7
+    6-. "<div>Solicita disponibilidad,<br />validación y pago a</div><div style='font-size: 70%'>[JSON/HTTPS]</div>" .->8
+    7-. "<div>Gestiona tours y sincroniza<br />solicitudes al recuperar<br />conexión con</div><div style='font-size: 70%'>[JSON/HTTPS]</div>" .->8
+    7-. "<div>Guarda y consulta solicitudes<br />pendientes en</div><div style='font-size: 70%'>[API IndexedDB (local)]</div>" .->10
+    8-. "<div>Consulta cupos y guarda<br />reservas y referencias de<br />pago en</div><div style='font-size: 70%'>[JDBC/TLS]</div>" .->9
+    8-. "<div>Valida el número del boleto<br />en</div><div style='font-size: 70%'>[JSON/HTTPS]</div>" .->13
+    8-. "<div>Crea órdenes de cobro y<br />consulta su estado en</div><div style='font-size: 70%'>[JSON/HTTPS]</div>" .->11
+    6-. "<div>Abre el formulario de pago<br />alojado en</div><div style='font-size: 70%'>[HTTPS]</div>" .->11
+    8-. "<div>Envía el itinerario y la<br />lista un día antes mediante</div><div style='font-size: 70%'>[JSON/HTTPS]</div>" .->12
+
+  end

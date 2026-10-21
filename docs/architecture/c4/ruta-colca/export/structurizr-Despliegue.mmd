@@ -1,0 +1,61 @@
+graph TB
+  linkStyle default fill:#ffffff
+
+  subgraph diagram ["Diagrama de despliegue de RutaColca - producción en temporada alta"]
+    style diagram fill:#ffffff,stroke:#ffffff
+
+    subgraph 32 ["Celular del turista"]
+      style 32 fill:#ffffff,stroke:#444444,color:#444444
+
+      33["<div style='font-weight: bold'>Web del turista</div><div style='font-size: 70%; margin-top: 0px'>[Container: React (SPA)]</div><div style='font-size: 80%; margin-top:10px'>Permite buscar tours,<br />registrar el boleto y<br />solicitar una reserva.</div>"]
+      style 33 fill:#0e7d73,stroke:#095750,color:#ffffff
+    end
+
+    subgraph 34 ["Tablet de la agencia"]
+      style 34 fill:#ffffff,stroke:#444444,color:#444444
+
+      35["<div style='font-weight: bold'>Portal de agencias</div><div style='font-size: 70%; margin-top: 0px'>[Container: React (PWA)]</div><div style='font-size: 80%; margin-top:10px'>Gestiona tours y reservas;<br />incluye acceso del<br />administrador según su rol.</div>"]
+      style 35 fill:#0e7d73,stroke:#095750,color:#ffffff
+      36[("<div style='font-weight: bold'>Reservas locales</div><div style='font-size: 70%; margin-top: 0px'>[Container: IndexedDB]</div><div style='font-size: 80%; margin-top:10px'>Guarda solicitudes<br />presenciales pendientes de<br />sincronización en la tablet.</div>")]
+      style 36 fill:#0e7d73,stroke:#a65e00,color:#ffffff
+    end
+
+    subgraph 38 ["Proveedor cloud"]
+      style 38 fill:#ffffff,stroke:#444444,color:#444444
+
+      39["<div style='font-weight: bold'>Balanceador HTTPS</div><div style='font-size: 70%; margin-top: 0px'>[Infrastructure Node: Balanceador gestionado]</div><div style='font-size: 80%; margin-top:10px'>Distribuye solicitudes entre<br />las dos réplicas de la API.</div>"]
+      style 39 fill:#e1e7eb,stroke:#9da1a4,color:#222222
+      40["<div style='font-weight: bold'>Alojamiento web</div><div style='font-size: 70%; margin-top: 0px'>[Infrastructure Node: Hosting estático HTTPS]</div><div style='font-size: 80%; margin-top:10px'>Entrega los archivos React al<br />navegador; la aplicación se<br />ejecuta en el cliente.</div>"]
+      style 40 fill:#e1e7eb,stroke:#9da1a4,color:#222222
+      subgraph 41 ["VM 1"]
+        style 41 fill:#ffffff,stroke:#444444,color:#444444
+
+        42["<div style='font-weight: bold'>API de RutaColca</div><div style='font-size: 70%; margin-top: 0px'>[Container: Java 21 / Spring Boot]</div><div style='font-size: 80%; margin-top:10px'>Gestiona cupos, valida<br />boletos, coordina pagos y<br />programa avisos.</div>"]
+        style 42 fill:#0e7d73,stroke:#095750,color:#ffffff
+      end
+
+      subgraph 45 ["VM 2"]
+        style 45 fill:#ffffff,stroke:#444444,color:#444444
+
+        46["<div style='font-weight: bold'>API de RutaColca</div><div style='font-size: 70%; margin-top: 0px'>[Container: Java 21 / Spring Boot]</div><div style='font-size: 80%; margin-top:10px'>Gestiona cupos, valida<br />boletos, coordina pagos y<br />programa avisos.</div>"]
+        style 46 fill:#0e7d73,stroke:#095750,color:#ffffff
+      end
+
+      subgraph 49 ["Base de datos gestionada"]
+        style 49 fill:#ffffff,stroke:#444444,color:#444444
+
+        50[("<div style='font-weight: bold'>Base de datos</div><div style='font-size: 70%; margin-top: 0px'>[Container: PostgreSQL 16]</div><div style='font-size: 80%; margin-top:10px'>Guarda agencias, tours,<br />salidas, reservas y<br />referencias de pago.</div>")]
+        style 50 fill:#0e7d73,stroke:#095750,color:#ffffff
+      end
+
+    end
+
+    35-. "<div>Guarda y consulta solicitudes<br />pendientes en</div><div style='font-size: 70%'>[API IndexedDB (local)]</div>" .->36
+    33-. "<div>Solicita disponibilidad,<br />validación y pago a</div><div style='font-size: 70%'>[JSON/HTTPS]</div>" .->42
+    35-. "<div>Gestiona tours y sincroniza<br />solicitudes al recuperar<br />conexión con</div><div style='font-size: 70%'>[JSON/HTTPS]</div>" .->42
+    33-. "<div>Solicita disponibilidad,<br />validación y pago a</div><div style='font-size: 70%'>[JSON/HTTPS]</div>" .->46
+    35-. "<div>Gestiona tours y sincroniza<br />solicitudes al recuperar<br />conexión con</div><div style='font-size: 70%'>[JSON/HTTPS]</div>" .->46
+    42-. "<div>Consulta cupos y guarda<br />reservas y referencias de<br />pago en</div><div style='font-size: 70%'>[JDBC/TLS]</div>" .->50
+    46-. "<div>Consulta cupos y guarda<br />reservas y referencias de<br />pago en</div><div style='font-size: 70%'>[JDBC/TLS]</div>" .->50
+
+  end
