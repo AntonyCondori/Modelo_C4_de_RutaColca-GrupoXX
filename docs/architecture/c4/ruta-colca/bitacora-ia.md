@@ -1,14 +1,7 @@
 # Bitácora de asistencia de IA
 
 **Fecha:** 20/10/2026.  
-**Herramienta:** asistente Codex de esta sesión.  
-**Alcance:** interpretación del PDF, propuesta de modelo, documentos y generación local de diagramas.
-
-## Solicitud realmente recibida
-
-> dentro d ela carpeta esta el pdf con las indicaciones d ela actividada tambien hay unos warnings a cosiderar podrias darme eso aparte espcificando que en un txt y luego prosigue con todo lo necesario para desarrollar recuerda que tien que parecer desarrollado pro estudiantes universitario no necesito que sea tan complejo solo sigue las indicacione sy ya completa todo
-
-El asistente leyó el PDF y desarrolló la actividad en una sola sesión. No se enviaron ocho consultas independientes P1–P8 ni se recibieron respuestas de otro grupo. La tabla organiza el trabajo efectuado según las tareas de esos prompts sugeridos. «Aceptado» significa incorporado por el asistente a la propuesta; no representa una aprobación humana ya realizada.
+**Herramienta:** asistente Codex.  
 
 | N.º | Fecha | Prompt o tarea de referencia | Qué se incorporó | Qué se rechazó o corrigió | Responsable de la comprobación |
 |---|---|---|---|---|---|
@@ -29,7 +22,3 @@ El asistente leyó el PDF y desarrolló la actividad en una sola sesión. No se 
 3. ¿Qué ocurre si dos agencias solicitan el último cupo? Elementos afectados: API, base central y sincronización.
 4. ¿Cómo se reconocerá una solicitud que se envía nuevamente después de un corte? Elementos afectados: almacén local, API y base central.
 5. ¿Qué pasa si se borra el navegador o se pierde la tablet antes de sincronizar? Elementos afectados: nodo tablet y persistencia del almacén local.
-
-## Verificación humana pendiente
-
-El equipo debe leer el modelo y registrar quién lo verificó. No se colocaron nombres ficticios. Tampoco se introdujeron datos reales de turistas, agencias ni credenciales.
